@@ -1,287 +1,262 @@
 
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  #app{min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;background:#0a0a0a;border-radius:12px;}
-  .screen{display:none;width:100%;max-width:440px;flex-direction:column;align-items:center;}
-  .screen.active{display:flex;animation:fadeUp 0.4s cubic-bezier(.22,1,.36,1) both;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
-  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-  @keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  @keyframes pop{0%{transform:scale(0.8);opacity:0;}70%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
-  @keyframes slideIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
-  @keyframes glow{0%,100%{box-shadow:0 0 0px #fff0;}50%{box-shadow:0 0 18px #ffffff22;}}
-  .logo{font-size:11px;font-weight:600;letter-spacing:0.18em;color:#444;text-transform:uppercase;margin-bottom:2rem;}
-  .logo span{color:#fff;}
-  .card{background:#111;border:0.5px solid #2a2a2a;border-radius:14px;padding:2rem;width:100%;text-align:center;position:relative;overflow:hidden;}
-  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#ffffff18,transparent);}
-  .card h2{font-size:20px;font-weight:500;margin-bottom:8px;color:#fff;letter-spacing:-0.02em;}
-  .card p{font-size:13px;color:#555;line-height:1.7;margin-bottom:1.5rem;}
-  .steps-row{display:flex;gap:5px;width:100%;margin-bottom:1.25rem;}
-  .step-dot{flex:1;height:2px;border-radius:1px;background:#1e1e1e;transition:background 0.4s;}
-  .step-dot.done{background:#fff;}
-  .step-dot.current{background:#666;animation:pulse 1.5s infinite;}
-  .progress-bar{width:100%;height:2px;background:#1e1e1e;border-radius:1px;margin-bottom:1.5rem;overflow:hidden;}
-  .progress-fill{height:100%;background:#fff;border-radius:1px;transition:width 0.9s linear;}
-  .step-indicator{font-size:11px;color:#333;margin-bottom:10px;letter-spacing:0.05em;}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 24px;border-radius:8px;border:0.5px solid #2a2a2a;background:transparent;color:#888;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;width:100%;margin-top:8px;letter-spacing:0.02em;}
-  .btn:not(:disabled):hover{background:#1a1a1a;border-color:#444;color:#fff;}
-  .btn:not(:disabled):active{transform:scale(0.98);}
-  .btn:disabled{opacity:0.3;cursor:not-allowed;}
-  .btn-primary{background:#fff;border-color:#fff;color:#000;font-weight:600;}
-  .btn-primary:not(:disabled):hover{background:#e8e8e8;border-color:#e8e8e8;color:#000;}
-  .btn-sm{font-size:12px;color:#333;border:none;background:none;cursor:pointer;margin-top:6px;padding:8px;width:auto;letter-spacing:0.04em;}
-  .btn-sm:hover{color:#666;}
-  .task-box{background:#0d0d0d;border:0.5px solid #1e1e1e;border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;text-align:left;width:100%;}
-  .task-label{font-size:10px;font-weight:600;color:#333;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;}
-  .task-text{font-size:13px;color:#555;line-height:1.6;}
-  .countdown{font-size:36px;font-weight:300;color:#fff;margin:0.75rem 0;letter-spacing:-0.03em;}
-  .countdown span{font-size:11px;color:#333;font-weight:400;display:block;margin-top:2px;letter-spacing:0.08em;text-transform:uppercase;}
-  .key-display{background:#0d0d0d;border:0.5px solid #2a2a2a;border-radius:8px;padding:14px 16px;font-family:var(--font-mono,monospace);font-size:16px;font-weight:500;letter-spacing:0.12em;color:#fff;margin:1rem 0 1.25rem;text-align:center;animation:glow 2.5s infinite;}
-  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;font-weight:500;letter-spacing:0.04em;}
-  .badge-w{background:#1a1a1a;color:#666;border:0.5px solid #2a2a2a;}
-  .badge-s{background:#1a1a1a;color:#fff;border:0.5px solid #444;}
-  .badge-d{background:#1a1a1a;color:#E24B4A;border:0.5px solid #3a1a1a;}
-  .captcha-btn{flex:1;padding:10px 8px;border-radius:6px;border:0.5px solid #1e1e1e;background:#0d0d0d;color:#555;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;}
-  .captcha-btn:hover{border-color:#333;color:#aaa;background:#141414;}
-  .captcha-btn.correct{background:#111;border-color:#fff;color:#fff;animation:pop 0.3s ease both;}
-  .captcha-btn.wrong{animation:shake 0.3s ease;border-color:#E24B4A;color:#E24B4A;}
-  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}50%{transform:translateX(-3px);}}
-  .verify-input{width:100%;padding:12px 14px;border:0.5px solid #2a2a2a;border-radius:8px;font-family:var(--font-mono,monospace);font-size:18px;background:#0d0d0d;color:#fff;margin-bottom:8px;text-align:center;letter-spacing:0.2em;transition:border-color 0.2s;}
-  .verify-input:focus{outline:none;border-color:#555;}
-  .verify-input.valid{border-color:#fff;}
-  .err-msg{font-size:12px;color:#E24B4A;margin-bottom:8px;display:none;animation:fadeIn 0.2s ease;letter-spacing:0.03em;}
-  .success-icon{font-size:40px;margin-bottom:12px;animation:pop 0.5s cubic-bezier(.22,1,.36,1) both;}
-  .spinner{width:18px;height:18px;border:2px solid #222;border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
-  .existing-key-box{background:#0d0d0d;border:0.5px solid #2a2a2a;border-radius:8px;padding:14px 16px;margin:1rem 0;text-align:left;animation:slideIn 0.3s ease;}
-  .divider{display:flex;align-items:center;gap:10px;width:100%;margin:1rem 0;}
-  .divider::before,.divider::after{content:'';flex:1;height:0.5px;background:#1e1e1e;}
-  .divider span{font-size:11px;color:#333;letter-spacing:0.06em;}
-  .copied-msg{font-size:12px;color:#fff;margin-top:6px;display:none;animation:fadeIn 0.2s ease;letter-spacing:0.04em;}
-  .key-actions{display:flex;gap:8px;width:100%;}
-  .key-actions .btn{margin-top:0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#000;--surface:#060606;--surface2:#0c0c0c;--border:#1c1c1c;--border2:#2a2a2a;
+  --text:#fff;--text2:#888;--text3:#333;--accent:#fff;--danger:#ff4444;
+}
+#app{min-height:580px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;background:var(--bg);}
+.screen{display:none;width:100%;max-width:420px;flex-direction:column;align-items:center;}
+.screen.active{display:flex;animation:fadeUp .45s cubic-bezier(.22,1,.36,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}65%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes glow{0%,100%{text-shadow:0 0 0px transparent}50%{text-shadow:0 0 20px #ffffff30}}
+@keyframes ticker{from{opacity:.4}to{opacity:1}}
+.wordmark{font-size:10px;font-weight:700;letter-spacing:.22em;color:var(--text3);text-transform:uppercase;margin-bottom:2.5rem;display:flex;align-items:center;gap:8px;}
+.wordmark::before,.wordmark::after{content:'';flex:1;height:.5px;background:var(--border);}
+.wordmark span{color:var(--text);}
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:2rem 1.75rem;width:100%;text-align:center;position:relative;overflow:hidden;}
+.card::after{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#ffffff06 0%,transparent 60%);pointer-events:none;}
+h2{font-size:22px;font-weight:400;color:var(--text);letter-spacing:-.03em;margin-bottom:6px;}
+.sub{font-size:13px;color:var(--text3);line-height:1.7;margin-bottom:1.5rem;}
+.dots-row{display:flex;gap:4px;width:100%;margin-bottom:1rem;}
+.dot{flex:1;height:1.5px;border-radius:1px;background:var(--surface2);transition:background .5s;}
+.dot.done{background:var(--text);}
+.dot.active{background:#444;animation:pulse 1.4s infinite;}
+.step-label{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.pbar{width:100%;height:1.5px;background:var(--border);border-radius:1px;margin-bottom:1.75rem;overflow:hidden;}
+.pfill{height:100%;background:var(--text);border-radius:1px;transition:width 1s linear;}
+.countdown{font-size:52px;font-weight:200;color:var(--text);letter-spacing:-.04em;margin:.5rem 0;animation:ticker .1s;}
+.countdown small{display:block;font-size:10px;color:var(--text3);font-weight:400;letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
+.info-box{background:var(--surface2);border:.5px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:1.25rem;text-align:left;}
+.info-label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;}
+.info-text{font-size:13px;color:#444;line-height:1.6;}
+.info-text.lit{color:#666;transition:color .3s;}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;border:.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;width:100%;margin-top:8px;letter-spacing:.02em;font-family:inherit;}
+.btn:not(:disabled):hover{border-color:#444;background:#080808;color:var(--text);}
+.btn:not(:disabled):active{transform:scale(.98);}
+.btn:disabled{opacity:.2;cursor:not-allowed;}
+.btn-fill{background:var(--text);border-color:var(--text);color:#000;font-weight:600;}
+.btn-fill:not(:disabled):hover{background:#ddd;border-color:#ddd;color:#000;}
+.btn-ghost{border:none;background:none;color:var(--text3);cursor:pointer;font-size:12px;letter-spacing:.05em;padding:8px;margin-top:4px;font-family:inherit;transition:color .2s;}
+.btn-ghost:hover{color:#555;}
+.c-row{display:flex;gap:6px;width:100%;margin-bottom:10px;}
+.c-btn{flex:1;padding:11px 6px;border-radius:8px;border:.5px solid var(--border);background:var(--surface2);color:#444;font-size:15px;font-weight:500;cursor:pointer;transition:all .18s;font-family:inherit;}
+.c-btn:hover{border-color:#333;color:#888;background:#0a0a0a;}
+.c-btn.correct{background:#000;border-color:var(--text);color:var(--text);animation:pop .3s ease both;}
+.c-btn.wrong{animation:shake .3s ease;border-color:var(--danger);color:var(--danger);}
+.v-input{width:100%;padding:14px;border:.5px solid var(--border2);border-radius:10px;font-family:monospace;font-size:22px;background:#000;color:var(--text);margin-bottom:8px;text-align:center;letter-spacing:.3em;transition:border-color .2s,box-shadow .2s;}
+.v-input:focus{outline:none;border-color:#333;box-shadow:0 0 0 3px #ffffff06;}
+.v-input.ok{border-color:var(--text);}
+.err{font-size:12px;color:var(--danger);margin-bottom:8px;display:none;animation:fadeIn .2s;letter-spacing:.03em;}
+.spinner{width:16px;height:16px;border:1.5px solid #111;border-top-color:#444;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+.key-box{background:#000;border:.5px solid var(--border2);border-radius:10px;padding:16px;font-family:monospace;font-size:15px;font-weight:500;letter-spacing:.14em;color:var(--text);margin:1rem 0 1.25rem;text-align:center;animation:glow 3s infinite;}
+.badge{display:inline-flex;align-items:center;font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.badge-dim{background:#0a0a0a;color:var(--text3);border:.5px solid var(--border);}
+.badge-lit{background:#0a0a0a;color:#555;border:.5px solid var(--border2);}
+.badge-ok{background:#000;color:#fff;border:.5px solid #333;}
+.divider{display:flex;align-items:center;gap:10px;width:100%;margin:.75rem 0;}
+.divider::before,.divider::after{content:'';flex:1;height:.5px;background:var(--border);}
+.divider span{font-size:10px;color:var(--text3);letter-spacing:.08em;}
+.copy-confirm{font-size:11px;color:#555;margin-top:6px;display:none;letter-spacing:.06em;text-transform:uppercase;animation:fadeIn .2s;}
+.row2{display:flex;gap:8px;width:100%;}
+.row2 .btn{margin-top:0;}
+.existing-key{background:#000;border:.5px solid var(--border);border-radius:8px;padding:14px 16px;margin:1rem 0;text-align:left;animation:fadeIn .3s;}
 </style>
 
 <div id="app">
-  <div id="screen-landing" class="screen active">
-    <div class="logo">OUP <span>Key System</span></div>
-    <div class="card" id="landing-card">
-      <div id="landing-checking" style="padding:1rem 0;text-align:center;">
-        <div class="spinner" style="margin:0 auto 12px;"></div>
-        <p style="font-size:13px;color:#333;margin:0;">Checking for existing key...</p>
+
+  <div id="s-landing" class="screen active">
+    <div class="wordmark">OUP <span>Key System</span></div>
+    <div class="card">
+      <div id="l-loading" style="padding:1.25rem 0;text-align:center;">
+        <div class="spinner" style="margin:0 auto 14px;"></div>
+        <p style="font-size:12px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;">Checking session...</p>
       </div>
-      <div id="landing-new" style="display:none;">
-        <h2>Access required</h2>
-        <p>To use this service you need a valid key. Complete 3 quick verification steps to receive yours.</p>
+      <div id="l-new" style="display:none">
+        <h2>Get your key</h2>
+        <p class="sub">Complete 3 short verification steps to receive a unique access key. Steps cannot be skipped.</p>
         <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
-          <span class="badge badge-w">3 steps</span>
-          <span class="badge badge-w">Free</span>
-          <span class="badge badge-d">Cannot skip</span>
+          <span class="badge badge-dim">3 steps</span>
+          <span class="badge badge-dim">~1 min</span>
+          <span class="badge badge-lit">No skip</span>
         </div>
-        <button class="btn btn-primary" onclick="startFlow()">Get my key →</button>
+        <button class="btn btn-fill" onclick="startFlow()">Begin verification →</button>
       </div>
-      <div id="landing-existing" style="display:none;">
+      <div id="l-existing" style="display:none">
+        <div style="display:flex;justify-content:center;margin-bottom:14px;"><span class="badge badge-ok">Key on file</span></div>
         <h2>Welcome back</h2>
-        <p>You already have a key associated with this session.</p>
-        <div class="existing-key-box">
-          <div class="task-label">Your key</div>
-          <div style="font-family:var(--font-mono,monospace);font-size:15px;font-weight:500;color:#fff;letter-spacing:0.1em;margin-top:4px;" id="existing-key-display"></div>
+        <p class="sub">A key is already saved to this session.</p>
+        <div class="existing-key">
+          <div class="info-label">Active key</div>
+          <div style="font-family:monospace;font-size:14px;font-weight:500;color:var(--text);letter-spacing:.1em;margin-top:5px;" id="l-existing-key"></div>
         </div>
-        <div class="key-actions">
-          <button class="btn btn-primary" onclick="copyExistingKey()" id="copy-existing-btn">Copy key</button>
-        </div>
-        <div class="copied-msg" id="copied-existing">✓ Copied</div>
+        <button class="btn btn-fill" onclick="copyExisting()" id="copy-ex-btn">Copy key</button>
+        <div class="copy-confirm" id="copy-ex-confirm">✓ Copied</div>
         <div class="divider"><span>or</span></div>
         <button class="btn" onclick="clearAndNew()">Generate new key</button>
-        <p style="font-size:11px;color:#222;margin-top:10px;margin-bottom:0;">Generating a new key will replace your current one.</p>
+        <p style="font-size:11px;color:var(--text3);margin-top:10px;">This replaces your current key permanently.</p>
       </div>
     </div>
   </div>
 
-  <div id="screen-step1" class="screen">
-    <div class="logo">OUP <span>Key System</span></div>
+  <div id="s-step1" class="screen">
+    <div class="wordmark">OUP <span>Key System</span></div>
     <div class="card">
-      <div class="steps-row">
-        <div class="step-dot current" id="s1d1"></div>
-        <div class="step-dot" id="s1d2"></div>
-        <div class="step-dot" id="s1d3"></div>
+      <div class="dots-row"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+      <div class="step-label">Step 1 of 3</div>
+      <div class="pbar"><div class="pfill" id="p1" style="width:0%"></div></div>
+      <h2>Session check</h2>
+      <p class="sub">Validating your session fingerprint. This cannot be skipped or interrupted.</p>
+      <div class="countdown" id="cd1">15<small>seconds</small></div>
+      <div class="info-box">
+        <div class="info-label">Status</div>
+        <div class="info-text" id="st1">Initializing...</div>
       </div>
-      <div class="step-indicator">Step 1 of 3 — Session verification</div>
-      <div class="progress-bar"><div class="progress-fill" id="p1" style="width:0%"></div></div>
-      <h2>Verifying session</h2>
-      <p>Your session fingerprint is being validated. This process cannot be skipped or bypassed.</p>
-      <div class="countdown" id="cd1">15<span>seconds remaining</span></div>
-      <div class="task-box">
-        <div class="task-label">Status</div>
-        <div class="task-text" id="st1" style="color:#555;">Initializing session scan...</div>
-      </div>
-      <button class="btn btn-primary" id="btn1" disabled onclick="goStep2()">Continue →</button>
+      <button class="btn btn-fill" id="btn1" disabled onclick="goStep2()">Continue →</button>
     </div>
   </div>
 
-  <div id="screen-step2" class="screen">
-    <div class="logo">OUP <span>Key System</span></div>
+  <div id="s-step2" class="screen">
+    <div class="wordmark">OUP <span>Key System</span></div>
     <div class="card">
-      <div class="steps-row">
-        <div class="step-dot done"></div>
-        <div class="step-dot current"></div>
-        <div class="step-dot"></div>
+      <div class="dots-row"><div class="dot done"></div><div class="dot active"></div><div class="dot"></div></div>
+      <div class="step-label">Step 2 of 3</div>
+      <div class="pbar"><div class="pfill" id="p2" style="width:0%"></div></div>
+      <h2>Human check</h2>
+      <p class="sub">Solve the challenge. Wrong answers reset the timer.</p>
+      <div class="info-box">
+        <div class="info-label">Challenge</div>
+        <div style="font-size:18px;font-weight:400;color:#888;margin-top:6px;" id="cq"></div>
       </div>
-      <div class="step-indicator">Step 2 of 3 — Human verification</div>
-      <div class="progress-bar"><div class="progress-fill" id="p2" style="width:0%"></div></div>
-      <h2>Captcha checkpoint</h2>
-      <p>Solve the challenge to continue. Wrong answers reset the countdown.</p>
-      <div class="task-box">
-        <div class="task-label">Challenge</div>
-        <div class="task-text" id="captcha-q" style="font-size:17px;font-weight:500;color:#ccc;"></div>
-      </div>
-      <div style="display:flex;gap:8px;width:100%;margin-bottom:10px;" id="captcha-opts"></div>
-      <div class="err-msg" id="err2">✕ Wrong answer — timer reset</div>
-      <div class="countdown" id="cd2">20<span>seconds remaining</span></div>
-      <button class="btn btn-primary" id="btn2" disabled onclick="goStep3()">Continue →</button>
+      <div class="c-row" id="c-opts"></div>
+      <div class="err" id="err2">✕ Incorrect — timer reset</div>
+      <div class="countdown" id="cd2">20<small>seconds</small></div>
+      <button class="btn btn-fill" id="btn2" disabled onclick="goStep3()">Continue →</button>
     </div>
   </div>
 
-  <div id="screen-step3" class="screen">
-    <div class="logo">OUP <span>Key System</span></div>
+  <div id="s-step3" class="screen">
+    <div class="wordmark">OUP <span>Key System</span></div>
     <div class="card">
-      <div class="steps-row">
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot current"></div>
+      <div class="dots-row"><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div></div>
+      <div class="step-label">Step 3 of 3</div>
+      <div class="pbar"><div class="pfill" id="p3" style="width:0%"></div></div>
+      <h2>Confirm code</h2>
+      <p class="sub">Enter the code below. It refreshes if the timer expires.</p>
+      <div class="info-box">
+        <div class="info-label">Your code</div>
+        <div style="font-family:monospace;font-size:32px;font-weight:200;color:var(--text);letter-spacing:.3em;text-align:center;margin-top:8px;" id="conf-code"></div>
       </div>
-      <div class="step-indicator">Step 3 of 3 — Code confirmation</div>
-      <div class="progress-bar"><div class="progress-fill" id="p3" style="width:0%"></div></div>
-      <h2>Enter confirmation code</h2>
-      <p>Type the 4-digit code displayed below. The code refreshes if the timer runs out.</p>
-      <div class="task-box">
-        <div class="task-label">Your code</div>
-        <div style="font-family:var(--font-mono,monospace);font-size:26px;font-weight:300;color:#fff;letter-spacing:0.25em;text-align:center;margin-top:6px;" id="conf-code"></div>
-      </div>
-      <input class="verify-input" id="code-input" maxlength="4" placeholder="_ _ _ _" oninput="checkCode()" />
-      <div class="err-msg" id="err3">✕ Incorrect code</div>
-      <div class="countdown" id="cd3">30<span>seconds remaining</span></div>
-      <button class="btn btn-primary" id="btn3" disabled onclick="revealKey()">Unlock key →</button>
+      <input class="v-input" id="code-input" maxlength="4" placeholder="——" oninput="checkCode()" autocomplete="off"/>
+      <div class="err" id="err3">✕ Wrong code</div>
+      <div class="countdown" id="cd3">30<small>seconds</small></div>
+      <button class="btn btn-fill" id="btn3" disabled onclick="revealKey()">Unlock key →</button>
     </div>
   </div>
 
-  <div id="screen-key" class="screen">
-    <div class="logo">OUP <span>Key System</span></div>
+  <div id="s-key" class="screen">
+    <div class="wordmark">OUP <span>Key System</span></div>
     <div class="card">
-      <div class="success-icon">🔑</div>
-      <div style="display:flex;justify-content:center;margin-bottom:14px;"><span class="badge badge-s">Key issued</span></div>
-      <h2>Your key is ready</h2>
-      <p>Copy and store it somewhere safe. This key is unique to your session.</p>
-      <div class="key-display" id="final-key"></div>
-      <div class="key-actions">
-        <button class="btn btn-primary" onclick="copyKey()" id="copy-btn">Copy</button>
+      <div style="font-size:36px;margin-bottom:14px;animation:pop .5s cubic-bezier(.22,1,.36,1) both;">🔑</div>
+      <div style="display:flex;justify-content:center;margin-bottom:16px;"><span class="badge badge-ok">Key issued</span></div>
+      <h2>Your key</h2>
+      <p class="sub">Save this somewhere safe — it's unique to your session.</p>
+      <div class="key-box" id="final-key"></div>
+      <div class="row2">
+        <button class="btn btn-fill" id="copy-btn" onclick="copyKey()">Copy</button>
         <button class="btn" onclick="restart()">New key</button>
       </div>
-      <div class="copied-msg" id="copied-msg">✓ Copied to clipboard</div>
+      <div class="copy-confirm" id="copy-confirm">✓ Copied to clipboard</div>
     </div>
   </div>
+
 </div>
 
 <script>
 const CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-let timers={};
-let captchaAnswer=null,captchaSolved=false,confCode='',generatedKey='';
-const STORAGE_KEY='oup_session_key';
+const SK='oup_key_v2';
+let T={},captchaAns=null,captchaDone=false,code='',finalKey='';
 
-function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function randStr(n){let s='';for(let i=0;i<n;i++)s+=CHARS[rand(0,CHARS.length-1)];return s;}
-function genKey(){return'KEY-'+randStr(5)+'-'+randStr(5)+'-'+randStr(5);}
+const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const rs=n=>{let s='';for(let i=0;i<n;i++)s+=CHARS[r(0,CHARS.length-1)];return s;};
+const genKey=()=>`KEY-${rs(5)}-${rs(5)}-${rs(5)}`;
 
-function showScreen(id){
+function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el=document.getElementById(id);
-  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
 }
 
-function checkExistingKey(){
+function checkExisting(){
   setTimeout(()=>{
-    let existing=null;
-    try{existing=localStorage.getItem(STORAGE_KEY);}catch(e){}
-    document.getElementById('landing-checking').style.display='none';
-    if(existing&&existing.startsWith('KEY-')){
-      document.getElementById('existing-key-display').textContent=existing;
-      document.getElementById('landing-existing').style.display='block';
+    let k=null;try{k=localStorage.getItem(SK);}catch(e){}
+    document.getElementById('l-loading').style.display='none';
+    if(k&&k.startsWith('KEY-')){
+      document.getElementById('l-existing-key').textContent=k;
+      document.getElementById('l-existing').style.display='block';
     } else {
-      document.getElementById('landing-new').style.display='block';
+      document.getElementById('l-new').style.display='block';
     }
-  },1400);
+  },1200);
 }
 
 function clearAndNew(){
-  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
-  document.getElementById('landing-existing').style.display='none';
-  document.getElementById('landing-new').style.display='block';
+  try{localStorage.removeItem(SK);}catch(e){}
+  document.getElementById('l-existing').style.display='none';
+  document.getElementById('l-new').style.display='block';
 }
 
-function startFlow(){showScreen('screen-step1');runStep1();}
+function startFlow(){show('s-step1');step1();}
 
-const statusMsgs=['Initializing session scan...','Validating browser fingerprint...','Checking session integrity...','Verifying request origin...','Almost done...'];
-function runStep1(){
-  let t=15;
-  const cd=document.getElementById('cd1');
-  const pb=document.getElementById('p1');
-  const btn=document.getElementById('btn1');
-  const st=document.getElementById('st1');
-  pb.style.width='0%';
-  cd.innerHTML=t+'<span>seconds remaining</span>';
-  let mi=0;
-  clearInterval(timers.t1);
-  timers.t1=setInterval(()=>{
-    t--;
-    pb.style.width=((15-t)/15*100)+'%';
-    cd.innerHTML=t+'<span>seconds remaining</span>';
-    if(t%3===0&&mi<statusMsgs.length){st.textContent=statusMsgs[mi++];}
-    if(t<=0){
-      clearInterval(timers.t1);
-      cd.innerHTML='✓<span>Verification complete</span>';
-      st.style.color='#fff';st.textContent='Session verified.';
-      btn.disabled=false;
-    }
+const msgs=['Initializing scan...','Validating fingerprint...','Checking origin...','Verifying integrity...','Session confirmed.'];
+function step1(){
+  let t=15,mi=0;
+  const cd=document.getElementById('cd1'),pb=document.getElementById('p1'),btn=document.getElementById('btn1'),st=document.getElementById('st1');
+  pb.style.width='0%';cd.innerHTML=`${t}<small>seconds</small>`;btn.disabled=true;
+  clearInterval(T.t1);
+  T.t1=setInterval(()=>{
+    t--;pb.style.width=`${(15-t)/15*100}%`;
+    cd.innerHTML=`${t}<small>seconds</small>`;
+    if(mi<msgs.length&&t%(3)===0){st.textContent=msgs[mi++];st.classList.add('lit');}
+    if(t<=0){clearInterval(T.t1);cd.innerHTML=`✓<small>Verified</small>`;st.textContent='Session verified.';btn.disabled=false;}
   },1000);
 }
 
 function goStep2(){
-  showScreen('screen-step2');
-  captchaSolved=false;
+  show('s-step2');captchaDone=false;
   document.getElementById('btn2').disabled=true;
   document.getElementById('err2').style.display='none';
-  makeCaptcha();runStep2Timer();
+  makeCaptcha();step2Timer();
 }
 
+const QS=[
+  {q:'7 + 5 = ?',a:12,o:[9,11,12,14]},{q:'3 × 4 = ?',a:12,o:[10,12,13,15]},
+  {q:'18 − 6 = ?',a:12,o:[11,12,14,16]},{q:'25 ÷ 5 = ?',a:5,o:[3,4,5,7]},
+  {q:'6 + 8 = ?',a:14,o:[12,13,14,15]},{q:'9 × 3 = ?',a:27,o:[24,26,27,29]},
+  {q:'50 − 13 = ?',a:37,o:[35,37,39,41]},{q:'8 × 7 = ?',a:56,o:[48,54,56,63]},
+  {q:'100 ÷ 4 = ?',a:25,o:[20,23,25,28]},{q:'11 + 17 = ?',a:28,o:[26,27,28,30]},
+];
+
 function makeCaptcha(){
-  const ops=[
-    {q:'What is 7 + 5?',a:12,opts:[9,11,12,14]},
-    {q:'What is 3 × 4?',a:12,opts:[10,12,13,15]},
-    {q:'What is 18 − 6?',a:12,opts:[11,12,14,16]},
-    {q:'What is 25 ÷ 5?',a:5,opts:[3,4,5,7]},
-    {q:'What is 6 + 8?',a:14,opts:[12,13,14,15]},
-    {q:'What is 9 × 3?',a:27,opts:[24,26,27,29]},
-    {q:'What is 50 − 13?',a:37,opts:[35,37,39,41]},
-    {q:'What is 8 × 7?',a:56,opts:[48,54,56,63]},
-  ];
-  const c=ops[rand(0,ops.length-1)];
-  captchaAnswer=c.a;captchaSolved=false;
-  document.getElementById('captcha-q').textContent=c.q;
-  const container=document.getElementById('captcha-opts');
-  container.innerHTML='';
-  [...c.opts].sort(()=>Math.random()-0.5).forEach(opt=>{
+  const c=QS[r(0,QS.length-1)];captchaAns=c.a;captchaDone=false;
+  document.getElementById('cq').textContent=c.q;
+  const ct=document.getElementById('c-opts');ct.innerHTML='';
+  [...c.o].sort(()=>Math.random()-.5).forEach(v=>{
     const b=document.createElement('button');
-    b.className='captcha-btn';b.textContent=opt;
-    b.onclick=()=>selectAnswer(opt,b);
-    container.appendChild(b);
+    b.className='c-btn';b.textContent=v;
+    b.onclick=()=>pick(v,b);
+    ct.appendChild(b);
   });
 }
 
-function selectAnswer(val,btn){
-  if(captchaSolved)return;
-  if(val===captchaAnswer){
-    captchaSolved=true;
+function pick(v,btn){
+  if(captchaDone)return;
+  if(v===captchaAns){
+    captchaDone=true;
     document.getElementById('err2').style.display='none';
     document.getElementById('btn2').disabled=false;
     btn.classList.add('correct');
@@ -289,125 +264,94 @@ function selectAnswer(val,btn){
     document.getElementById('err2').style.display='block';
     btn.classList.add('wrong');
     setTimeout(()=>btn.classList.remove('wrong'),400);
-    clearInterval(timers.t2);runStep2Timer();
+    clearInterval(T.t2);step2Timer();
   }
 }
 
-function runStep2Timer(){
+function step2Timer(){
   let t=20;
-  const cd=document.getElementById('cd2');
-  const pb=document.getElementById('p2');
-  clearInterval(timers.t2);
-  pb.style.width='0%';
-  cd.innerHTML=t+'<span>seconds remaining</span>';
-  timers.t2=setInterval(()=>{
-    t--;
-    pb.style.width=((20-t)/20*100)+'%';
-    cd.innerHTML=t+'<span>seconds remaining</span>';
+  const cd=document.getElementById('cd2'),pb=document.getElementById('p2');
+  clearInterval(T.t2);pb.style.width='0%';cd.innerHTML=`${t}<small>seconds</small>`;
+  T.t2=setInterval(()=>{
+    t--;pb.style.width=`${(20-t)/20*100}%`;
+    cd.innerHTML=`${t}<small>seconds</small>`;
     if(t<=0){
-      clearInterval(timers.t2);
-      if(!captchaSolved){
-        cd.innerHTML='0<span>Resetting...</span>';
-        setTimeout(()=>{makeCaptcha();runStep2Timer();},1000);
-      }
+      clearInterval(T.t2);
+      if(!captchaDone){cd.innerHTML=`0<small>Resetting...</small>`;setTimeout(()=>{makeCaptcha();step2Timer();},900);}
     }
   },1000);
 }
 
 function goStep3(){
-  showScreen('screen-step3');
+  show('s-step3');
   document.getElementById('btn3').disabled=true;
   document.getElementById('err3').style.display='none';
   document.getElementById('code-input').value='';
-  document.getElementById('code-input').classList.remove('valid');
-  confCode=String(rand(1000,9999));
-  document.getElementById('conf-code').textContent=confCode;
-  runStep3Timer();
+  document.getElementById('code-input').classList.remove('ok');
+  code=String(r(1000,9999));
+  document.getElementById('conf-code').textContent=code;
+  step3Timer();
 }
 
 function checkCode(){
-  const val=document.getElementById('code-input').value.trim();
-  const err=document.getElementById('err3');
+  const v=document.getElementById('code-input').value.trim();
   const inp=document.getElementById('code-input');
-  if(val.length===4){
-    if(val===confCode){
-      document.getElementById('btn3').disabled=false;
-      inp.classList.add('valid');
-      err.style.display='none';
-    } else {
-      err.style.display='block';
-      inp.classList.remove('valid');
-      document.getElementById('btn3').disabled=true;
-    }
-  } else {
-    err.style.display='none';
-    inp.classList.remove('valid');
-    document.getElementById('btn3').disabled=true;
-  }
+  if(v.length===4){
+    if(v===code){document.getElementById('btn3').disabled=false;inp.classList.add('ok');document.getElementById('err3').style.display='none';}
+    else{document.getElementById('btn3').disabled=true;inp.classList.remove('ok');document.getElementById('err3').style.display='block';}
+  } else {inp.classList.remove('ok');document.getElementById('btn3').disabled=true;document.getElementById('err3').style.display='none';}
 }
 
-function runStep3Timer(){
+function step3Timer(){
   let t=30;
-  const cd=document.getElementById('cd3');
-  const pb=document.getElementById('p3');
-  clearInterval(timers.t3);
-  pb.style.width='0%';
-  cd.innerHTML=t+'<span>seconds remaining</span>';
-  timers.t3=setInterval(()=>{
-    t--;
-    pb.style.width=((30-t)/30*100)+'%';
-    cd.innerHTML=t+'<span>seconds remaining</span>';
+  const cd=document.getElementById('cd3'),pb=document.getElementById('p3');
+  clearInterval(T.t3);pb.style.width='0%';cd.innerHTML=`${t}<small>seconds</small>`;
+  T.t3=setInterval(()=>{
+    t--;pb.style.width=`${(30-t)/30*100}%`;
+    cd.innerHTML=`${t}<small>seconds</small>`;
     if(t<=0){
-      clearInterval(timers.t3);
-      cd.innerHTML='0<span>Refreshing code...</span>';
+      clearInterval(T.t3);cd.innerHTML=`0<small>Refreshing...</small>`;
       document.getElementById('code-input').value='';
-      document.getElementById('code-input').classList.remove('valid');
+      document.getElementById('code-input').classList.remove('ok');
       document.getElementById('btn3').disabled=true;
       document.getElementById('err3').style.display='none';
-      setTimeout(()=>{
-        confCode=String(rand(1000,9999));
-        document.getElementById('conf-code').textContent=confCode;
-        runStep3Timer();
-      },900);
+      setTimeout(()=>{code=String(r(1000,9999));document.getElementById('conf-code').textContent=code;step3Timer();},800);
     }
   },1000);
 }
 
 function revealKey(){
-  clearInterval(timers.t1);clearInterval(timers.t2);clearInterval(timers.t3);
-  generatedKey=genKey();
-  try{localStorage.setItem(STORAGE_KEY,generatedKey);}catch(e){}
-  document.getElementById('final-key').textContent=generatedKey;
-  document.getElementById('copied-msg').style.display='none';
-  showScreen('screen-key');
+  clearInterval(T.t1);clearInterval(T.t2);clearInterval(T.t3);
+  finalKey=genKey();
+  try{localStorage.setItem(SK,finalKey);}catch(e){}
+  document.getElementById('final-key').textContent=finalKey;
+  document.getElementById('copy-confirm').style.display='none';
+  show('s-key');
 }
 
 function copyKey(){
-  navigator.clipboard.writeText(generatedKey).catch(()=>{});
-  document.getElementById('copied-msg').style.display='block';
-  const btn=document.getElementById('copy-btn');
-  btn.textContent='✓ Copied';
-  setTimeout(()=>btn.textContent='Copy',2000);
+  navigator.clipboard.writeText(finalKey).catch(()=>{});
+  document.getElementById('copy-confirm').style.display='block';
+  const b=document.getElementById('copy-btn');b.textContent='✓ Copied';
+  setTimeout(()=>b.textContent='Copy',2000);
 }
 
-function copyExistingKey(){
-  const k=document.getElementById('existing-key-display').textContent;
+function copyExisting(){
+  const k=document.getElementById('l-existing-key').textContent;
   navigator.clipboard.writeText(k).catch(()=>{});
-  document.getElementById('copied-existing').style.display='block';
-  const btn=document.getElementById('copy-existing-btn');
-  btn.textContent='✓ Copied';
-  setTimeout(()=>btn.textContent='Copy key',2000);
+  document.getElementById('copy-ex-confirm').style.display='block';
+  const b=document.getElementById('copy-ex-btn');b.textContent='✓ Copied';
+  setTimeout(()=>b.textContent='Copy key',2000);
 }
 
 function restart(){
-  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
-  document.getElementById('landing-new').style.display='none';
-  document.getElementById('landing-existing').style.display='none';
-  document.getElementById('landing-checking').style.display='block';
-  showScreen('screen-landing');
-  checkExistingKey();
+  try{localStorage.removeItem(SK);}catch(e){}
+  document.getElementById('l-new').style.display='none';
+  document.getElementById('l-existing').style.display='none';
+  document.getElementById('l-loading').style.display='block';
+  show('s-landing');checkExisting();
 }
 
-checkExistingKey();
+checkExisting();
 </script>
 
